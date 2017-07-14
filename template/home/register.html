@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>簡易留言板</title>
+    <link rel="stylesheet" type="text/css" href="/assets/vendor/bootstrap/css/bootstrap.min.css">
+    <script type="text/javascript" src="/assets/vendor/js/jquery.js"></script>
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script> -->
+    <script type="text/javascript" src="/assets/vendor/js/member/member.js"></script>
+</head>
+<body>
+<div class="container">
+    <h2>{{$title}}</h2>
+    <form id="fregister" enctype="multipart/form-data" onsubmit="return register_member({{$identity}})">
+	    <div class="form-group">
+	      	<label for="username">Username:</label>
+	      	<input id="user_id" type="text" name="username" class="form-control" placeholder="Enter username">
+	    </div>
+	    <div class="form-group">
+	      	<label for="pwd">Password:</label>
+	      	<input id="user_pw" type="password" name="password" class="form-control" placeholder="Enter password">
+	    </div>
+	    <div class="form-group">
+	      	<label for="pwd">Password again:</label>
+	      	<input id="user_pw_ck" type="password" class="form-control" placeholder="Enter password again">
+	    </div>
+	    <div class="form-group">
+	      	<label for="name">Name:</label>
+	      	<input id="user_nm" type="text" name="membername" class="form-control" placeholder="Enter nickname">
+	    </div>
+	    <div class="form-group">
+	      	<label for="name">Image:</label>
+	      	<input id="user_img" type="file" name="memberimg"">
+	    </div>
+<!-- 	    <select name="authority">
+          	<option value="manager">管理者</option>
+          	<option value="user">使用者</option>
+        </select> -->
+	    <input type="submit" class="btn btn-default" value="註冊">
+	</form>
+</body>
+</html>
