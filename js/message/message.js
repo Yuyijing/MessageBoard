@@ -4,7 +4,7 @@ function msg_delete(msg_ID) {
 	var del_fg = confirm("確定要刪除嗎?");
 	if(del_fg) {
 		$.ajax({
-			url: "/delete",
+			url: "/message/board/deletemessage",
 			data: {id:msg_ID},
 			type: "get",
 			dataType: 'text',

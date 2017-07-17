@@ -24,23 +24,24 @@ function register_member(identity) {
 	}
 	
 	$.ajax({
-			url: "/register",
+			url: "/login/userlogin/register",
 			data:{
 				authority: identity,
 				username: $('#user_id').val(),
 				password: $("#user_pw").val(),
-				membername: $("#user_nm").val()
+				membername: $("#user_nm").val(),
 			},
 			type: "post",
 			dataType: 'text',
 			success: function (msg) {
 				// console.log(msg);
 				if (msg == "OK") {
-					location.href = "/login";
+					location.href = "/login/userlogin";
 					alert("新增完成!");
 				} else if(msg == "error") {
+					location.reload();
 					alert("帳號已被註冊!");
-				}
+				} 
 			}
 		});
 }	
@@ -60,17 +61,17 @@ function login_member() {
 	}
 	
 	$.ajax({
-			url: "/login",
+			url: "userlogin/login",
 			data:{
 				username: $('#user_id').val(),
-				password: $("#user_pw").val(),
+				password: $("#user_pw").val()
 			},
 			type: "post",
 			dataType: 'text',
 			success: function (msg) {
-				// console.log(msg);
+				// alert(msg);
 				if (msg == "OK") {
-					location.href = "/message";
+					location.href = "/message/board/showmessage";
 					alert("登入成功!");
 
 				} else if(msg == "error"){
@@ -87,11 +88,10 @@ function login_member() {
 
 //刪除會員
 function mem_delete(mem_ID) {
-	// var del_fg = false;
 	var del_fg = confirm("確定要刪除嗎?");
 	if(del_fg) {
 		$.ajax({
-			url: "/deletemember",
+			url: "/member/data/deletemember",
 			data: {id:mem_ID},
 			type: "get",
 			dataType: 'text',
