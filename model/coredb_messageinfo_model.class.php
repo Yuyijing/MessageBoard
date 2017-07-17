@@ -14,6 +14,7 @@ class CoreDB_MessageInfo_Model extends MyDBModel
         'LeaveTime'		 => 'datetime',
         'ReplyContent'   => 'string',
         'ReplyTime'		 => 'datetime',
+        'MsgMemID'       => 'int',
     );
 
     //留言
@@ -31,8 +32,6 @@ class CoreDB_MessageInfo_Model extends MyDBModel
     public function showMessage($_iOffset, $i_PerPage) {
 
     	$sSql = "SELECT * FROM messageinfo ORDER BY LeaveTime desc LIMIT %i,%i";
-    	// var_export($iMsgCount);
-    	// exit();
     	$aMessageList = $this->select_all($sSql, array($_iOffset, $i_PerPage));
     	return $aMessageList;
     }
@@ -72,11 +71,18 @@ class CoreDB_MessageInfo_Model extends MyDBModel
  	}
 
  	//搜尋留言
- 	public function searchMessage($_condition, $_keyword) {
- 		$sStr = "%".$_keyword."%";
- 		$sSql = "SELECT * FROM messageinfo WHERE $_condition LIKE %s";
-    	$aMessageList = $this->select_all($sSql, array($sStr));
+ 	public function searchMessage($_condition, $_skeyword, $_iOffset, $_iPerPage) {
+ 		$sStr = "%".$_skeyword."%";
+ 		$sSql = "SELECT * FROM messageinfo WHERE $_condition LIKE %s ORDER BY LeaveTime desc LIMIT %i,%i";
+    	$aMessageList = $this->select_all($sSql, array($sStr, $_iOffset, $_iPerPage));
     	return $aMessageList;
  	}
+
+    //搜尋結果數
+    public function countSearchMessage($_condition, $_keyword) {
+        $sStr = "%".$_keyword."%";
+        $sSql = "SELECT COUNT(*) FROM messageinfo WHERE $_condition LIKE %s";
+        return $this->select_one($sSql, array($sStr));
+    }
 
 }

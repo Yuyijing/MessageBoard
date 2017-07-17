@@ -28,12 +28,11 @@ class CoreDB_MemberInfo_Model extends MyDBModel
     }
 
     public function updateRegisterData($_iAuthority, $_sName, $_sUsername, $_sPassword) {
-        //存入資料庫
         return $this->insert(array(
-                'Authority' => $_iAuthority,
-                'MemberName' => $_sName,
-                'Username' => $_sUsername,
-                'Password' => $_sPassword,
+            'Authority' => $_iAuthority, 
+            'MemberName' => $_sName, 
+            'Username' => $_sUsername,
+            'Password' => $_sPassword 
             ));
     }
 
