@@ -16,15 +16,15 @@
           		<a class="navbar-brand">Welcome</a>
         	</div>
 	        <ul class="nav navbar-nav">
-	            <li class="active"><a href="/message">Home</a></li>
+	            <li class="active"><a href="/message/board/showmessage">Home</a></li>
 	            <!--<li><a href="#" onclick="window.open('leave_message_UI.php', '留言吧', config='height=500,width=500');">我要留言</a></li>-->
-                <li><a href="#" onclick="window.open('/leavemessage', '留言吧', config='height=500,width=500');">我要留言</a></li>
+                <li><a href="#" onclick="window.open('/message/board/leavemessage', '留言吧', config='height=500,width=500');">我要留言</a></li>
             {{if $authority == 2}}
-                <li><a href="/editmemdata">修改會員資料</a></li>
+                <li><a href="/member/data/editmemdata">修改會員資料</a></li>
             {{else}}
-	            <li><a href="/membermgmt">會員管理</a></li> 
+	            <li><a href="/member/data/membermgmt">會員管理</a></li> 
             {{/if}}
-	            <li><a href="/logout">Log out</a></li>
+	            <li><a href="/login/userlogin/logout">Log out</a></li>
 	        </ul> 
 	    </div>
     </nav>
