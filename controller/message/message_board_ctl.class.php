@@ -1,5 +1,6 @@
 <?php
-require_once "../classes/model/coreDB_messageinfo_model.class.php";
+require_once "../classes/model/coreDB_newmessageinfo_model.class.php";
+require_once "../classes/model/coreDB_msgreplyinfo_model.class.php";
 
 class Message_Board_Ctl extends Controller {
     
@@ -15,13 +16,11 @@ class Message_Board_Ctl extends Controller {
 
     public function post_leavemessage() {
         session_start();
-        // $sSubject = Input::post('s', 'subject');
-        // $sContent = Input::post('s', 'content');
         $sSubject = htmlspecialchars(Input::post('s', 'subject'));
         $sContent = htmlspecialchars(Input::post('s', 'content'));
-        $sName = Input::session('s', 'MemberName');
-        $oModel = new CoreDB_MessageInfo_Model;
-        $oModel->leaveMessage($sSubject, $sContent, $sName);
+        $iMemberID = Input::session('i', 'MemberID');
+        $oModel = new CoreDB_NewMessageInfo_Model;
+        $oModel->leaveMessage($sSubject, $sContent, $iMemberID);
     }
 
 
@@ -32,41 +31,18 @@ class Message_Board_Ctl extends Controller {
         $iPage = Input::get('i', 'pagenum');
         $iAuthority = Input::session('i', 'Authority');
         $sMemberName = Input::session('s', 'MemberName');
-      
-        $oModel = new CoreDB_MessageInfo_Model;
-        //留言筆數
-        $aMsgCount = $oModel->countMessage();
-        $iMsgCount = (int)$aMsgCount['COUNT(*)'];
-        $iPerPage = 10;
-        $iPageCount = ceil($iMsgCount / $iPerPage);
-        //分頁
-        $aPageData = $this->checkPage($iPage, $iPageCount, $iPerPage);
-        $aMessageList = $oModel->showMessage($aPageData['offset'], $iPerPage);
-        return Smarty_View::make(
-            'home/showmessage.html', 
-            array('messagelist' => $aMessageList, 
-                  'authority' => $iAuthority, 
-                  'membername' => $sMemberName,
-                  'pages' => $iPageCount,
-                  'left' => $aPageData['left'],
-                  'right' => $aPageData['right']));
+
+        $oMegModel = new CoreDB_NewMessageInfo_Model;
+        $oRepModel = new CoreDB_MsgReplyInfo_Model;
         
-    }
-
-    //搜尋
-    public function post_showmessage() {
-        session_start();
-        $iPage = Input::get('i', 'spagenum');
-        $iAuthority = Input::session('i', 'Authority');
-        $sMemberName = Input::session('s', 'MemberName');
-        $sKeyword = Input::post('s', 'keyword');
-
+        $sKeyword = Input::get('s', 'keyword');
         if (isset($sKeyword)) {
+            /*搜尋留言*/
             $sSelect = Input::post('s', 'searchKind');
             switch ($sSelect) {
-              case 'Name':
-                $condition = "Name";
-                break;
+              // case 'Name':
+              //   $condition = "Name";
+              //   break;
               case 'Subject':
                 $condition = "Subject";
                 break;             
@@ -74,24 +50,39 @@ class Message_Board_Ctl extends Controller {
                 $condition = "Content";
                 break;
             }
+            //留言筆數
+            $aMsgCount = $oMegModel->countSearchMessage($condition, $sKeyword);
+        } else {
+            /*一般顯示留言*/
+            //留言筆數
+            $aMsgCount = $oMegModel->countMessage();
         }
 
-        $oModel = new CoreDB_MessageInfo_Model;
-        //留言筆數
-        $aMsgCount = $oModel->countSearchMessage($condition, $sKeyword);
         $iMsgCount = (int)$aMsgCount['COUNT(*)'];
         $iPerPage = 10;
         $iPageCount = ceil($iMsgCount / $iPerPage);
         //分頁
         $aPageData = $this->checkPage($iPage, $iPageCount, $iPerPage);
-        $aMessageList = $oModel->searchMessage($condition, $sKeyword, (int)$aPageData['offset'], $iPerPage);
-        // var_dump($aMessageList);
-        // exit();
+        //取得留言
+        if (isset($sKeyword)) {
+            $aMessageList = $oMegModel->searchMessage($condition, $sKeyword, (int)$aPageData['offset'], $iPerPage);
+        } else {
+            $aMessageList = $oMegModel->showMessage($aPageData['offset'], $iPerPage);
+        }
+        //取得回覆留言
+        $iNum = 0;
+        foreach ($aMessageList as $key => $value) {
+            $imsgID = (int)$value['MessageID'];
+            $aReplyList[$iNum] = $oRepModel->getMsgReply($imsgID);
+            $iNum++;
+        } 
+
         return Smarty_View::make(
             'home/showmessage.html', 
             array('messagelist' => $aMessageList, 
                   'authority' => $iAuthority, 
                   'membername' => $sMemberName,
+                  'replylist' => $aReplyList,
                   'pages' => $iPageCount,
                   'left' => $aPageData['left'],
                   'right' => $aPageData['right']));
@@ -100,7 +91,7 @@ class Message_Board_Ctl extends Controller {
     //編輯留言
     public function get_editmessage() {
         $iMessageID = Input::get('i', 'id');
-        $oModel = new CoreDB_MessageInfo_Model;
+        $oModel = new CoreDB_NewMessageInfo_Model;
         $aMessage = $oModel->getMessage($iMessageID);   
         return Smarty_View::make('home/leavemessage.html', array('message' => $aMessage, 'value' =>"修改完成"));
     }
@@ -109,14 +100,14 @@ class Message_Board_Ctl extends Controller {
         $sSubject = htmlspecialchars(Input::post('s', 'subject'));
         $sContent = htmlspecialchars(Input::post('s', 'content'));
         $iMessageID = Input::get('i', 'id');
-        $oModel = new CoreDB_MessageInfo_Model;
+        $oModel = new CoreDB_NewMessageInfo_Model;
         $aMessage = $oModel->editMessage($sSubject, $sContent, $iMessageID);
     }
 
     //刪除留言
     public function get_deletemessage() {
         $iMessageID = Input::get('i', 'id');
-        $oModel = new CoreDB_MessageInfo_Model;
+        $oModel = new CoreDB_NewMessageInfo_Model;
         $oModel->deleteMessage($iMessageID);
         return "OK";
     }
@@ -124,7 +115,7 @@ class Message_Board_Ctl extends Controller {
     //回覆留言
     public function get_replymessage() {
         $iMessageID = Input::get('i', 'id');
-        $oModel = new CoreDB_MessageInfo_Model;
+        $oModel = new CoreDB_NewMessageInfo_Model;
         $aMessage = $oModel->getMessage($iMessageID);
         return Smarty_View::make('home/replymessage.html', array('message' => $aMessage));
     }
@@ -132,8 +123,8 @@ class Message_Board_Ctl extends Controller {
     public function post_replymessage() {
         $iMessageID = Input::get('i', 'id');
         $sReplyContent = htmlspecialchars(Input::post('s', 'reply'));
-        $oModel = new CoreDB_MessageInfo_Model;
-        $oModel->replyMessage($iMessageID, $sReplyContent);
+        $oModel = new CoreDB_MsgReplyInfo_Model;
+        $oModel->replyMessage($iMessageID, $sReplyContent, $iMessageID);
     }
 
     //判斷是否已登入
