@@ -5,6 +5,8 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>帳號列表</title>
     <link rel="stylesheet" type="text/css" href="/assets/vendor/bootstrap/css/bootstrap.min.css">
+    <script type="text/javascript" src="/assets/vendor/js/jquery.js"></script>
+    <script type="text/javascript" src="/assets/vendor/js/message/message.js"></script>
 </head>
 <body onunload="unLoad();">
 	<table class="table table-bordered">
@@ -22,13 +24,4 @@
 		<textarea class="form-control" rows="8" name="reply"></textarea><br>
 		<center><input type="submit" class="btn btn-info" value="回覆"></center>
 	</form>
-
-	<script type="text/JavaScript">
-        //回留言視窗關閉子視窗
-        function unLoad(){
-            opener.window.location.reload();
-            window.close();
-            alert("回覆成功!");
-        }
-    </script>
 </body>
